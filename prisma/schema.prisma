@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String     @id @default(cuid())
+  email                String     @unique
+  name                 String?
+  avatarUrl            String?
+  handle               String?
+  tier                 String     @default("FREE") // FREE, PRO, FOUNDER_LTD
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  carousels            Carousel[]
+  purchases            Purchase[]
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+}
+
+model Carousel {
+  id            String   @id @default(cuid())
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  title         String
+  topic         String
+  framework     String   @default("story")
+  aspectRatio   String   @default("4:5") // "4:5" (vertical 1080x1350) or "1:1" (square 1080x1080)
+  theme         String   @default("modern_minimal") // modern_minimal, dark_tech, bold_gradient, editorial_classic
+  authorName    String?
+  authorHandle  String?
+  authorAvatar  String?
+  showWatermark Boolean  @default(true)
+  slides        Slide[]
+  twitterThread String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Slide {
+  id           String   @id @default(cuid())
+  carouselId   String
+  carousel     Carousel @relation(fields: [carouselId], references: [id], onDelete: Cascade)
+  slideNumber  Int
+  slideType    String   @default("content") // hook, content, insight, takeaway, cta
+  tagline      String?
+  title        String
+  body         String
+  bulletPoints String?  // JSON serialized string array
+  highlight    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([carouselId])
+}
+
+model Purchase {
+  id              String   @id @default(cuid())
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  stripeSessionId String   @unique
+  tier            String   // PRO, FOUNDER_LTD
+  amount          Int      // in cents (e.g. 4900, 1900)
+  currency        String   @default("usd")
+  status          String   @default("completed") // completed, pending, refunded
+  createdAt       DateTime @default(now())
+}
