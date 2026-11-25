@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StudioControls } from "@/components/StudioControls";
@@ -24,7 +25,7 @@ import {
   Share2,
   TrendingUp,
   Layers,
-  FileCheck,
+  Sliders,
 } from "lucide-react";
 
 const INITIAL_CAROUSEL: CarouselData = generateDeterministicCarousel({
@@ -81,7 +82,6 @@ export default function HomePage() {
           showWatermark: currentTier === "FREE",
         });
       } else {
-        // Fallback locally
         const fallback = generateDeterministicCarousel(req);
         setCarousel({
           ...fallback,
@@ -103,7 +103,6 @@ export default function HomePage() {
   const handleExportPDF = async () => {
     setIsExporting(true);
     try {
-      // Instant client-side vector PDF generation via jsPDF
       const { generateCarouselPDF } = await import("@/lib/pdf");
       const pdfBytes = generateCarouselPDF(carousel);
       const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
@@ -169,6 +168,13 @@ export default function HomePage() {
     }
   };
 
+  const scrollToStudio = () => {
+    const el = document.getElementById("studio");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   const scrollToPricing = () => {
     const el = document.getElementById("pricing");
     if (el) {
@@ -176,11 +182,10 @@ export default function HomePage() {
     }
   };
 
-  // Quick prompt chips
   const promptSuggestions = [
     "5 High-Leverage Habits of Top 1% Solopreneurs",
     "How to Scale from $0 to $10k MRR Without Paid Ads",
-    "Why 90% of Tech Startups Fail at Customer Acquisition",
+    "Why 90% of Startups Fail at Customer Acquisition",
     "The 1-Person AI Software Agency Playbook",
   ];
 
@@ -189,30 +194,64 @@ export default function HomePage() {
       <Navbar currentTier={currentTier} onUpgradeClick={scrollToPricing} />
 
       <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden pt-12 pb-16 md:pt-20 md:pb-24 border-b border-slate-200 bg-gradient-to-b from-blue-50/50 via-white to-slate-50">
+        {/* Clean Hero Section */}
+        <section className="relative overflow-hidden pt-12 pb-16 md:pt-16 md:pb-20 border-b border-slate-200 bg-gradient-to-b from-blue-50/40 via-white to-slate-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 border border-blue-200 text-xs font-bold text-blue-800 shadow-sm animate-pulse">
-              <Zap className="w-3.5 h-3.5 fill-blue-600" />
-              <span>Day 1 Launch: LinkedIn Carousel & Visual Hook Studio</span>
+            {/* Crisp Benefit Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 border border-blue-200 text-xs font-bold text-blue-800 shadow-sm">
+              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <span>Viral LinkedIn Slide Studio • Zero Design Skills Needed</span>
             </div>
 
+            {/* 3-Second Clarity Headline */}
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-950 tracking-tight max-w-4xl mx-auto leading-[1.08]">
-              Create High-Converting <br className="hidden sm:inline" />
+              Turn Any Idea into a Viral <br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500">
-                LinkedIn Carousels
+                LinkedIn Carousel
               </span>{" "}
               in 30 Seconds
             </h1>
 
+            {/* Subheadline */}
             <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto font-normal leading-relaxed">
-              Stop spending 4+ hours wrestling in Figma or Canva. Transform your raw notes, blogs, or ideas into viral, multi-page slide decks and companion Twitter threads with Google Gemini.
+              Stop spending hours struggling in Canva or Figma. Paste your notes or topic and download ready-to-post, high-resolution carousel PDFs.
             </p>
 
+            {/* 3 Benefit Bullets */}
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-5 text-xs font-semibold text-slate-600">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" /> Ready in 30 seconds
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" /> 8 designer visual themes
+              </span>
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" /> 1-click vector PDF export
+              </span>
+            </div>
+
+            {/* Primary Action Buttons */}
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={scrollToStudio}
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/25 transition-all active:scale-95"
+              >
+                <Sparkles className="h-4 w-4" />
+                <span>Create Free Carousel Now</span>
+              </button>
+
+              <button
+                onClick={scrollToPricing}
+                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 px-6 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition-all active:scale-95"
+              >
+                <span>View Pricing ($9 / $49 LTD)</span>
+              </button>
+            </div>
+
             {/* Quick Inspiration Chips */}
-            <div className="pt-2 flex flex-wrap items-center justify-center gap-2 max-w-3xl mx-auto">
+            <div className="pt-6 flex flex-wrap items-center justify-center gap-2 max-w-3xl mx-auto">
               <span className="text-xs font-semibold text-slate-400 mr-1">
-                Try a prompt:
+                Try a topic:
               </span>
               {promptSuggestions.map((sug, idx) => (
                 <button
@@ -226,6 +265,7 @@ export default function HomePage() {
                       authorName: carousel.authorName,
                       authorHandle: carousel.authorHandle,
                     });
+                    scrollToStudio();
                   }}
                   className="px-3 py-1 bg-white hover:bg-blue-50 hover:border-blue-300 border border-slate-200 rounded-full text-xs text-slate-700 font-medium transition-all shadow-sm active:scale-95"
                 >
@@ -233,24 +273,20 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-
-            {/* Metrics Trust Strip */}
-            <div className="pt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 font-medium">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> 1080×1350 High-Res PDF Export
-              </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> 4 Battle-Tested Theme Presets
-              </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Companion X/Twitter Threads
-              </span>
-            </div>
           </div>
         </section>
 
-        {/* Studio Workspace Section */}
+        {/* Studio Workspace Section (Front & Center) */}
         <section id="studio" className="py-12 md:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 text-center sm:text-left">
+            <h2 className="text-2xl font-black text-slate-900">
+              Interactive Carousel Studio
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Customize text, colors, and layout on the left — preview the live slides on the right.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left Controls Column (5 cols) */}
             <div className="lg:col-span-5 order-2 lg:order-1">
@@ -277,19 +313,19 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Framework Breakdown Section */}
+        {/* Framework Breakdown Section (Visual & Concise) */}
         <section id="frameworks" className="py-16 bg-white border-t border-slate-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-            <div className="text-center max-w-2xl mx-auto space-y-3">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+            <div className="text-center max-w-2xl mx-auto space-y-2">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-xs font-bold text-indigo-700 uppercase tracking-wider">
                 <Layers className="w-3.5 h-3.5" />
-                Proven Conversion Architecture
+                Proven Viral Structures
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-950 tracking-tight">
-                Built on 5 Viral LinkedIn Frameworks
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight">
+                5 High-Converting Slide Frameworks
               </h2>
-              <p className="text-sm text-slate-500">
-                Each carousel is generated using structured psychological frameworks designed to maximize save rates, comments, and direct inquiries.
+              <p className="text-xs sm:text-sm text-slate-500">
+                Choose the framework that matches your content to maximize engagement and reposts.
               </p>
             </div>
 
@@ -306,7 +342,7 @@ export default function HomePage() {
                     <h3 className="font-bold text-slate-900 text-sm">
                       {fw.name}
                     </h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed font-normal">
                       {fw.description}
                     </p>
                   </div>
@@ -320,8 +356,7 @@ export default function HomePage() {
                         authorName: carousel.authorName,
                         authorHandle: carousel.authorHandle,
                       });
-                      const el = document.getElementById("studio");
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                      scrollToStudio();
                     }}
                     className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors pt-2"
                   >
