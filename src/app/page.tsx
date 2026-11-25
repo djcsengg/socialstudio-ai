@@ -10,7 +10,9 @@ import { CompanionThreadModal } from "@/components/CompanionThreadModal";
 import {
   CarouselData,
   GenerateCarouselRequest,
+  TierType,
 } from "@/lib/types";
+import { TierKey } from "@/lib/stripe";
 import { generateDeterministicCarousel } from "@/lib/ai";
 import { FRAMEWORKS } from "@/lib/themes";
 import {
@@ -36,7 +38,7 @@ const INITIAL_CAROUSEL: CarouselData = generateDeterministicCarousel({
 
 export default function HomePage() {
   const [carousel, setCarousel] = useState<CarouselData>(INITIAL_CAROUSEL);
-  const [currentTier, setCurrentTier] = useState<"FREE" | "PRO" | "FOUNDER_LTD">("FREE");
+  const [currentTier, setCurrentTier] = useState<TierType>("FREE");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isThreadOpen, setIsThreadOpen] = useState(false);
@@ -101,17 +103,10 @@ export default function HomePage() {
   const handleExportPDF = async () => {
     setIsExporting(true);
     try {
-      const res = await fetch("/api/export-pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ carousel }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to export PDF");
-      }
-
-      const blob = await res.blob();
+      // Instant client-side vector PDF generation via jsPDF
+      const { generateCarouselPDF } = await import("@/lib/pdf");
+      const pdfBytes = generateCarouselPDF(carousel);
+      const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -120,15 +115,38 @@ export default function HomePage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch (err) {
-      console.error("PDF download error:", err);
-      alert("Failed to generate PDF. Please try again.");
+    } catch (clientErr) {
+      console.warn("Client-side PDF generation failed, falling back to server route:", clientErr);
+      try {
+        const res = await fetch("/api/export-pdf", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ carousel }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to export PDF");
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${carousel.title.toLowerCase().replace(/[^a-z0-9_-]/g, "-")}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (err) {
+        console.error("PDF download error:", err);
+        alert("Failed to generate PDF. Please try again.");
+      }
     } finally {
       setIsExporting(false);
     }
   };
 
-  const handleSelectTier = async (tier: "FOUNDER_LTD" | "PRO", email: string) => {
+  const handleSelectTier = async (tier: TierKey, email: string) => {
     setCheckoutLoadingTier(tier);
     try {
       const res = await fetch("/api/checkout", {

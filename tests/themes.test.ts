@@ -2,11 +2,16 @@ import { describe, it, expect } from "vitest";
 import { THEMES, FRAMEWORKS } from "../src/lib/themes";
 
 describe("Theme Presets & Framework Definitions", () => {
-  it("defines all 4 required theme presets", () => {
+  it("defines all 8 required theme presets", () => {
+    expect(Object.keys(THEMES)).toHaveLength(8);
     expect(THEMES.modern_minimal).toBeDefined();
     expect(THEMES.dark_tech).toBeDefined();
     expect(THEMES.bold_gradient).toBeDefined();
     expect(THEMES.editorial_classic).toBeDefined();
+    expect(THEMES.neo_brutalist).toBeDefined();
+    expect(THEMES.emerald_growth).toBeDefined();
+    expect(THEMES.crimson_bold).toBeDefined();
+    expect(THEMES.nordic_frost).toBeDefined();
   });
 
   it("each theme has valid PDF RGB colors and container classes", () => {

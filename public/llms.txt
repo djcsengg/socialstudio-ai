@@ -1,0 +1,19 @@
+# SocialStudio AI
+> AI LinkedIn Carousel & Visual Hook Studio for Creators and B2B Founders
+
+SocialStudio AI converts ideas, raw notes, and articles into viral LinkedIn carousels, PDF slide decks, and companion X/Twitter threads in 30 seconds.
+
+## Core Capabilities
+- **Viral Frameworks**: Story Arc, Step-by-Step, Myth vs Fact, Contrarian Take, Listicle.
+- **Visual Design Themes**: Modern Minimal, Dark Tech, Bold Gradient, Editorial Classic, Neo Brutalist, Emerald Growth, Crimson Bold, Nordic Frost.
+- **Instant Client-Side Vector PDF**: Generates 1080x1350 (4:5) and 1080x1080 (1:1) crisp vector PDFs ready for LinkedIn document upload.
+- **Companion Threads**: Auto-generates matching Twitter/X threads to cross-post and double audience reach.
+- **Self-Serve Monetization**: Free interactive preview with no signup wall, Creator Starter Pack ($9 for 35 generations), Founder Lifetime Deal ($49 one-time), and BYOK ($29 LTD).
+
+## Technical Architecture
+- Framework: Next.js 14 App Router + TailwindCSS + Lucide Icons
+- LLM Intelligence: Google Gemini 1.5 Pro / Flash with structured JSON output and strict fallback
+- Document Rendering: Vector client-side PDF rendering with jsPDF
+- Monetization: Stripe Checkout + Webhook verification with idempotent deduplication
+- Database: SQLite / PostgreSQL via Prisma ORM
+- Edge Rate Limiting: Sliding window token limiter on API endpoints

@@ -11,7 +11,13 @@ export type ThemeId =
   | "modern_minimal"
   | "dark_tech"
   | "bold_gradient"
-  | "editorial_classic";
+  | "editorial_classic"
+  | "neo_brutalist"
+  | "emerald_growth"
+  | "crimson_bold"
+  | "nordic_frost";
+
+export type TierType = "FREE" | "STARTER" | "FOUNDER_LTD" | "BYOK" | "PRO";
 
 export type SlideType = "hook" | "content" | "insight" | "takeaway" | "cta";
 

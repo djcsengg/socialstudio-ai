@@ -13,7 +13,9 @@ model User {
   name                 String?
   avatarUrl            String?
   handle               String?
-  tier                 String     @default("FREE") // FREE, PRO, FOUNDER_LTD
+  tier                 String     @default("FREE") // FREE, STARTER, PRO, FOUNDER_LTD, BYOK
+  credits              Int        @default(5)      // 5 free generations, +35 for Starter, 200 for Founder LTD, -1 for BYOK/Pro
+  byokApiKey           String?
   stripeCustomerId     String?
   stripeSubscriptionId String?
   carousels            Carousel[]
@@ -63,9 +65,17 @@ model Purchase {
   userId          String?
   user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   stripeSessionId String   @unique
-  tier            String   // PRO, FOUNDER_LTD
-  amount          Int      // in cents (e.g. 4900, 1900)
+  tier            String   // STARTER, FOUNDER_LTD, BYOK, PRO
+  amount          Int      // in cents or paise
   currency        String   @default("usd")
   status          String   @default("completed") // completed, pending, refunded
   createdAt       DateTime @default(now())
+}
+
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  eventId   String   @unique
+  eventType String
+  processed Boolean  @default(true)
+  createdAt DateTime @default(now())
 }

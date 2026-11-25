@@ -7,7 +7,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.22-darkblue?logo=prisma)](https://www.prisma.io/)
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
-[![Tests](https://img.shields.io/badge/Tests-22%2F22%20Passing-brightgreen)](https://vitest.dev/)
+[![Tests](https://img.shields.io/badge/Tests-32%2F32%20Passing-brightgreen)](https://vitest.dev/)
 
 ---
 
@@ -17,10 +17,19 @@
 
 ### Core Value Propositions
 * **30-Second AI Transformation:** Input raw notes, blog links, or rough ideas. SocialStudio AI automatically structures them into hooked, multi-slide narratives engineered for LinkedIn's document algorithm.
-* **4 High-Converting Visual Themes:** Instant switching between **Minimal Dark**, **Editorial Clean**, **Bold Punchy**, and **Gradient Glow** styling presets.
-* **Pixel-Perfect PDF Export:** Generates crisp vector PDFs formatted for LinkedIn document carousels with 1-click download. Free exports include a discreet viral watermark; paid plans export watermark-free.
+* **8 High-Converting Visual Themes:** Instant switching between **Modern Minimal**, **Dark Tech**, **Bold Gradient**, **Editorial Classic**, **Neo Brutalist**, **Emerald Growth**, **Crimson Bold**, and **Nordic Frost** styling presets.
+* **Pixel-Perfect Vector PDF Export:** Generates crisp 1080x1350 (4:5) and 1080x1080 (1:1) vector PDFs formatted for LinkedIn document carousels with instant client-side download. Free exports include a discreet watermark; paid plans export watermark-free.
 * **Companion X/Twitter Threads:** Automatically produces ready-to-post companion threads matched to the carousel's talking points to maximize cross-platform reach.
-* **Self-Serve Monetization:** Built-in Stripe Checkout supporting the $49 Founder Lifetime Deal and $19/month Pro subscription, with webhook verification.
+* **Self-Serve Monetization & Dual Pricing:**
+  * **Creator Starter Pack ($9 / ₹499):** 35 high-res carousel exports, watermark-free, all 8 visual themes.
+  * **Founder Lifetime Deal ($49 / ₹1,499):** 200 generations/year, custom brand kit, lifetime access.
+  * **BYOK Lifetime License ($29 / ₹999):** Bring your own Gemini/OpenAI key for unlimited generations with zero AI markups.
+  * **SocialStudio Pro ($19/mo / ₹999):** Flexible monthly recurring subscription.
+* **Scalable Edge Infrastructure & Security:**
+  * In-memory sliding window rate limiting on `/api/generate` (5 req/min for anonymous; 20 req/min for paid accounts).
+  * Strict Zod schema validation on prompt payloads and model outputs.
+  * Idempotent Stripe webhook deduplication via `WebhookEvent` table.
+  * AI search optimization via `/llms.txt`, `sitemap.xml`, and JSON-LD structured metadata.
 * **Zero-Friction Offline Fallbacks:** Operates seamlessly even without external API credentials using smart heuristic templates and mock checkout testing.
 
 ---
@@ -31,31 +40,36 @@
 src/
 ├── app/
 │   ├── page.tsx                     # Main Studio (Input, Preview & Live Deck Editor)
-│   ├── layout.tsx                   # Root HTML layout and metadata
+│   ├── layout.tsx                   # Root HTML layout, SEO/GEO metadata & JSON-LD
+│   ├── sitemap.ts                   # Dynamic Next.js sitemap generator
 │   ├── globals.css                  # Custom styling & font definitions
 │   ├── checkout/success/page.tsx    # Stripe payment confirmation & license activation
 │   └── api/
-│       ├── generate/route.ts        # AI Slide generation endpoint (Gemini + fallback)
-│       ├── export-pdf/route.ts      # Server-side high-res PDF generation
+│       ├── generate/route.ts        # AI generation with rate limiting & credit checks
+│       ├── export-pdf/route.ts      # Server-side high-res PDF generation fallback
 │       ├── checkout/route.ts        # Stripe checkout session creation
 │       ├── checkout/verify/route.ts # License verification endpoint
-│       └── webhooks/stripe/route.ts # Webhook listener for payment events
+│       └── webhooks/stripe/route.ts # Idempotent webhook listener for payment events
 ├── components/
 │   ├── Navbar.tsx                   # Header with Pro upgrade modal & theme controls
 │   ├── StudioControls.tsx           # Topic/idea input, tone selector, slide count
 │   ├── SlideDeck.tsx                # Multi-slide visual carousel manager
 │   ├── SlidePreview.tsx             # Interactive slide card renderer
 │   ├── CompanionThreadModal.tsx     # 1-click copy companion X thread
-│   ├── PricingSection.tsx           # Lifetime & Monthly Pro upgrade cards
+│   ├── PricingSection.tsx           # 4-tier monetization cards (Starter, LTD, BYOK, Pro)
 │   └── Footer.tsx                   # Footer & copyright
 ├── lib/
 │   ├── ai.ts                        # Gemini API client & intelligent template engine
 │   ├── pdf.ts                       # jsPDF vector carousel rendering engine
-│   ├── themes.ts                    # Theme definitions (fonts, colors, contrast)
+│   ├── rate-limit.ts                # In-memory sliding window edge rate limiter
+│   ├── themes.ts                    # 8 visual theme presets (fonts, colors, contrast)
 │   ├── stripe.ts                    # Stripe integration & webhook signature verification
 │   ├── prisma.ts                    # Database client for users & generated decks
 │   └── types.ts                     # TypeScript definitions for slides & themes
-└── tests/                           # 22 automated unit & integration tests
+├── public/
+│   ├── llms.txt                     # Machine-readable documentation for AI search crawlers
+│   └── robots.txt                   # Search crawler directives
+└── tests/                           # 32 automated unit & integration tests
 ```
 
 ---
@@ -68,23 +82,18 @@ src/
 
 ### Installation
 
-1. Navigate to the project directory:
-   ```bash
-   cd fc40f234-e02f-4cc6-bb6a-322c61c4b86b/_default
-   ```
-
-2. Install dependencies:
+1. Install dependencies:
    ```bash
    npm install
    ```
 
-3. Initialize local database:
+2. Initialize local database:
    ```bash
    npx prisma generate
    npx prisma db push
    ```
 
-4. Run development server:
+3. Run development server:
    ```bash
    npm run dev
    ```
@@ -123,7 +132,8 @@ npm test
 ### Test Coverage Highlights
 * `tests/ai.test.ts`: Validates topic parsing, slide structuring, and offline fallback generation.
 * `tests/pdf.test.ts`: Verifies PDF formatting, multi-page layout, and watermark removal for Pro users.
-* `tests/themes.test.ts`: Validates visual theme styling, palette contrast, and typography definitions.
+* `tests/rate-limit.test.ts`: Verifies sliding-window rate limiting for anonymous and authenticated accounts.
+* `tests/themes.test.ts`: Validates visual theme styling, palette contrast, and typography definitions for all 8 presets.
 * `tests/stripe.test.ts`: Verifies checkout session creation, webhook payload handling, and license activation.
 
 ---
@@ -132,4 +142,4 @@ npm test
 
 In accordance with ATS company operating standards:
 * Daily work wraps at **11:00 PM IST**.
-* Prior to cutoff, all active updates are documented, README files verified, test suites executed, and changes pushed to respective GitHub repositories.
+* Prior to cutoff, all active updates are documented, README files verified, test suites executed, and changes committed cleanly.

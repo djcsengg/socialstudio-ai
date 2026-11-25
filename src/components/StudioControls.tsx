@@ -7,6 +7,7 @@ import {
   ThemeId,
   AspectRatio,
   GenerateCarouselRequest,
+  TierType,
 } from "@/lib/types";
 import { THEMES, FRAMEWORKS } from "@/lib/themes";
 import {
@@ -28,7 +29,7 @@ interface StudioControlsProps {
   onCarouselChange: (carousel: CarouselData) => void;
   onGenerate: (req: GenerateCarouselRequest) => void;
   isGenerating: boolean;
-  currentTier: "FREE" | "PRO" | "FOUNDER_LTD";
+  currentTier: TierType;
   onUpgradeClick: () => void;
 }
 

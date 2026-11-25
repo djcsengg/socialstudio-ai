@@ -9,6 +9,10 @@ describe("High-Resolution Multi-Page PDF Export Engine", () => {
     "dark_tech",
     "bold_gradient",
     "editorial_classic",
+    "neo_brutalist",
+    "emerald_growth",
+    "crimson_bold",
+    "nordic_frost",
   ];
 
   const aspectRatios: AspectRatio[] = ["4:5", "1:1"];

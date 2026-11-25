@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /checkout/success
+
+Sitemap: https://socialstudio.ats.ai/sitemap.xml
